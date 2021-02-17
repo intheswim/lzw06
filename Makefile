@@ -15,7 +15,7 @@ common: common.c
 		$(CC) $(CFLAGS) -c common.c
 
 main : lzw06pack lzw06unpack common main.c
-		$(CC) $(CFLAGS) -o lzw06 main.c $(LIBS) lzw06pack.o lzw06unpack.o common.o
+		$(CC) $(CFLAGS) -o lzw06 main.c $(CLIBS) lzw06pack.o lzw06unpack.o common.o
 
 makelib: lzw06pack.o lzw06unpack.o common.o
 		ar rcs liblzw06.a lzw06pack.o lzw06unpack.o common.o
