@@ -62,8 +62,7 @@ order when  writing 12-bit codes and reading them. Search for "little endian" in
 code. 
 
 2. Input file size  limit can be fixed by replacing  4-byte file  size header in
-compressed file with 48- or 64-bit value.  Additionally fileSize() function must
-return 64-bit size as opposed to platform dependent "long". 
+compressed file with 48- or 64-bit value. 
 
 </pre>
 

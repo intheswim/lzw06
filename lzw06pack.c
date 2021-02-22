@@ -158,7 +158,7 @@ int Compress(const char *filename, const char *outfile, int flags)
   const char label[4] = "LZW";
   const uint8_t version = PACKER_VERSION;
   uint8_t infoBits = 0;
-  uint32_t inputSize = 0;
+  uint32_t inputSize = 0, outputSize = 0;
   int compress_ok = true;
   struct packHelper ph;
 
@@ -282,12 +282,20 @@ int Compress(const char *filename, const char *outfile, int flags)
   DeleteHashTable(&ph);
 
   free(buffer);
+
+  outputSize = ftell (ph.fout);
+
   fclose(ph.fp);
   fclose (ph.fout);
 
   if (!compress_ok)
   {
     cleanup (outfile, flags);
+  }
+
+  if (compress_ok && (VERBOSE_OUTPUT & flags))
+  {
+    printf ("Compression ratio %.2f%%\n", 100.0 * outputSize / inputSize );
   }
 
   return compress_ok ? 1 : 0;

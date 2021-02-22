@@ -42,25 +42,6 @@ struct progArguments
 
 /*--------------------------------------------------------------------*/
 
-static long fileSize (const char *filename)
-{
-  long ret = -1;
-
-  FILE *fp = fopen (filename, "rb");
-
-  if (!fp) return -1;
-
-  fseek (fp, 0, SEEK_END);
-
-  ret = ftell (fp);
-
-  fclose (fp);
-
-  return ret;
-}
-
-/*--------------------------------------------------------------------*/
-
 static void show_command (const char* cmd) 
 {
   char buffer[128];
@@ -128,7 +109,7 @@ static enum ArgOption parseArguments (int argc, char *argv[], struct progArgumen
 
     if (argc == 1)
     {
-        return -1;
+        return PARSE_ERROR;
     }
 
     for (i = 1; i < argc; i++)
@@ -137,7 +118,7 @@ static enum ArgOption parseArguments (int argc, char *argv[], struct progArgumen
         {
             if (fileNameSet)
             {
-                return -1;
+                return PARSE_ERROR;
             }
 
             if ((i == 1) && 0 == strcmp(argv[1], "-large"))
@@ -180,7 +161,7 @@ static enum ArgOption parseArguments (int argc, char *argv[], struct progArgumen
                 else 
                 {
                     fprintf (stderr, "Unknown flag -%c\n", flag);
-                    return -1;
+                    return PARSE_ERROR;
                 }
             }
         }
@@ -202,24 +183,24 @@ static enum ArgOption parseArguments (int argc, char *argv[], struct progArgumen
     if (flagTest + flagPack + flagUnpack > 1) /* inconsistent args */
     {
         fprintf (stderr, "Cannot combine -p, -u and -t flags.\n");
-        return -1;
+        return PARSE_ERROR;
     }
 
     if (flagTest + flagPack + flagUnpack == 0) 
     {
         fprintf (stderr, "No pack, unpack or test flags given.\n");
-        return -1;
+        return PARSE_ERROR;
     }
 
     if (flagTest)
     {
       if (NULL == params->inputFile)
-        return -1;
+        return PARSE_ERROR;
     }
     else
     {
       if (NULL == params->inputFile || NULL == params->outputFile)
-        return -1;
+        return PARSE_ERROR;
     }
 
     if (flagForce) params->flags |= OVERWRITE_FLAG;
@@ -258,7 +239,6 @@ static int syntheticDataTest (int kilobytes256, enum ByteSequence option)
   const char input [] = "synth.bin";
   const char packed_input[] = "synth.lzw";
   const char unpacked_input[] = "synth.out";
-  long orig_size, compressed_size;
 
   if (true) 
   { 
@@ -305,11 +285,6 @@ static int syntheticDataTest (int kilobytes256, enum ByteSequence option)
 
   printf ("Synthetic input decompression successful.\n");
 
-  orig_size = fileSize (input);
-  compressed_size = fileSize (packed_input);
-
-  printf ("Compression ratio %.2f%%\n", 100.0 * compressed_size / orig_size);
-
   /* compare two files by running cksum */
 
   run_cksum (input);
@@ -340,7 +315,6 @@ int main (int argc, char *argv[])
 
   const char temp_name [] = "lzw06_temp.lzw";
   const char out_name [] = "lzw06_out.bin";
-  long orig_size = 0, compressed_size = 0;
 
   enum ArgOption option = parseArguments (argc, argv, &params);
 
@@ -376,15 +350,6 @@ int main (int argc, char *argv[])
     else 
     {
       printf ("Compression successful.\n");
-
-      if (params.flags & VERBOSE_OUTPUT)
-      {
-        orig_size = fileSize (params.inputFile);
-        compressed_size = fileSize (temp_name);
-
-        printf ("Compression ratio %.2f%%\n", 100.0 * compressed_size / orig_size);
-      }
-
       ret = EXIT_SUCCESS;
     }
   }
@@ -424,11 +389,6 @@ int main (int argc, char *argv[])
     {
       printf ("Decompression successful.\n");
     }
-
-    orig_size = fileSize (params.inputFile);
-    compressed_size = fileSize (temp_name);
-
-    printf ("Compression ratio %.2f%%\n", 100.0 * compressed_size / orig_size);
 
     /* compare 2 files. */
 
