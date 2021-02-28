@@ -10,7 +10,7 @@
 
 /* TRANSLATION: */
 
-/*******************************8******************/
+/**************************************************/
 /*  LZW compression program with full dictionary  */
 /*  reset when filled up. Constant 12-bit codes   */ 
 /*  in output.                                    */   

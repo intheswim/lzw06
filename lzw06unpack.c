@@ -54,7 +54,7 @@ int Decompress(const char *filename, const char *outfile, int flags)
   char label[4] = { 0 };
   uint8_t version = 255;
   uint16_t stack [BUFFLEN];
-  uint16_t sufix [HT_MAX_CODE];
+  uint16_t suffix [HT_MAX_CODE];
   uint8_t outline [BUFFLEN];
   uint16_t prefix [HT_MAX_CODE];
 
@@ -165,6 +165,8 @@ int Decompress(const char *filename, const char *outfile, int flags)
   }
 
   memset(prefix, CLEAR_BYTE, HT_SIZE);
+
+  memset (suffix, 0, sizeof(suffix)); /* this is just to make static analyzer happy */
   
   while (true)
   {
@@ -231,14 +233,14 @@ int Decompress(const char *filename, const char *outfile, int flags)
           if (prefix[code] == NOT_CODE)
           {
             CurPrefix = OldCode;
-            sufix[RunCode] = GetPrefixChar(OldCode, prefix);
-            stack[StackCount++] = sufix[RunCode];
+            suffix[RunCode] = GetPrefixChar(OldCode, prefix);
+            stack[StackCount++] = suffix[RunCode];
           }
           else
             CurPrefix = code;
           while (CurPrefix > 255)
           {
-            stack[StackCount++] = sufix[CurPrefix];
+            stack[StackCount++] = suffix[CurPrefix];
             CurPrefix = prefix[CurPrefix];
           }
           stack[StackCount++] = CurPrefix;
@@ -249,7 +251,7 @@ int Decompress(const char *filename, const char *outfile, int flags)
         {
           prefix[RunCode] = OldCode;
           if (code != RunCode)
-            sufix[RunCode] = GetPrefixChar(code, prefix);
+            suffix[RunCode] = GetPrefixChar(code, prefix);
           RunCode++;
         }
         OldCode = code;

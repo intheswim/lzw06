@@ -219,6 +219,13 @@ static void run_cksum (const char *file)
   size_t size = strlen (file) + 1;
 
   char * command = (char *)malloc (size + 32);
+
+  if (!command)
+  {
+    perror ("Cannot allocate memory.");
+    return;
+  }
+
 #if defined(__linux__)
   sprintf (command, "cksum %s", file); 
 #elif defined(_WIN32)
