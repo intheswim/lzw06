@@ -295,7 +295,7 @@ int Compress(const char *filename, const char *outfile, int flags)
 
   if (compress_ok && (VERBOSE_OUTPUT & flags))
   {
-    printf ("Compression ratio %.2f%%\n", 100.0 * outputSize / inputSize );
+    printf ("Compression ratio %.2f%%\n", 100.0 * (inputSize - outputSize) / inputSize );
   }
 
   return compress_ok ? 1 : 0;
